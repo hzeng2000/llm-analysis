@@ -1,0 +1,35 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "train",
+                "--model_name", "decapoda-research_llama-7b-hf",
+                "--gpu_name", "a100-pcie-40gb",
+                "--activation_recomputation", "0",
+                "--tp_size", "1",
+                "--pp_size", "1",
+                "--sp_size", "1",
+                "--global_batch_size", "16384",
+                "--total_num_tokens", "32768",
+                "--seq_len", "1024",
+                "--total_num_gpus", "128",
+                "--flops_efficiency", "0.5",
+                "--hbm_memory_efficiency", "0.9",
+                "--output_dir", "/home/hzeng/prj/llm-analysis/results_128gpus_a100-pcie-40gb_gb16384",
+                "--batch_size_per_gpu", "4",
+                "--log_level", "WARNING",
+                "--output_file_suffix", "\"4\""
+            ]
+        }
+    ]
+}

@@ -6,5 +6,6 @@
     "vocab_size": 32000,
     "max_seq_len": 2048,
     "ffn_embed_dim": 20480,
-    "model_type": "llama"
+    "model_type": "llama",
+    "param_count": 13
 }

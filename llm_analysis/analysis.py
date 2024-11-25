@@ -19,7 +19,11 @@ from enum import Enum
 from functools import total_ordering
 from pprint import pformat
 from typing import Union
+import sys
+llm_analysis_path = '/home/hzeng/prj/FAST/llm-analysis'
 
+if llm_analysis_path not in sys.path:
+    sys.path.append(llm_analysis_path)
 import fire
 
 from llm_analysis.config import (DtypeConfig, GPUConfig, ModelConfig,
@@ -1487,7 +1491,7 @@ class LLMAnalysis:
         logger.info(config_str)
 
     def get_configs_desc(self) -> str:
-        return f"{self.model_config.name}-{self.gpu_config.name}-{self.dtype_config.name}-tp{self.parallelism_config.tp_size}-pp{self.parallelism_config.pp_size}-dp{self.parallelism_config.dp_size}-sp{self.parallelism_config.sp_size}-fe{round(self.flops_efficiency, 2)}-ep{self.parallelism_config.ep_size}-hbme{round(self.hbm_memory_efficiency, 2)}"
+        return f"{self.model_config.name}-{self.gpu_config.name}-{self.dtype_config.name}-tp{self.parallelism_config.tp_size}-pp{self.parallelism_config.pp_size}-dp{self.parallelism_config.dp_size}-sp{self.parallelism_config.sp_size}-fe{round(self.flops_efficiency, 2)}-ep{self.parallelism_config.ep_size}-hbme{self.hbm_memory_efficiency}"
 
     def get_readable_summary_dict(self,
                                   summary_dict: dict,
@@ -1514,9 +1518,10 @@ class LLMAnalysis:
         print_human_readable: bool = True,
         output_file_prefix: str = "",
         output_file_suffix: str = "",
+        activation_recomputation: int = 0,
     ):
         file_name = output_file_prefix + self.get_configs_desc(
-        ) + output_file_suffix + "-summary.json"
+        ) + f'-ac{activation_recomputation}'+output_file_suffix + "-summary.json"
 
         if not os.path.exists(output_dir):
             try:
@@ -2491,9 +2496,10 @@ class LLMAnalysis:
         if output_dir is not None:
             self.output_summary_dict(summary_dict,
                                      output_dir,
-                                     print_human_readable=True,
+                                     print_human_readable=False,
                                      output_file_prefix=output_file_prefix,
-                                     output_file_suffix=output_file_suffix)
+                                     output_file_suffix=output_file_suffix,
+                                     activation_recomputation=activation_recomputation)
 
         return summary_dict
 
@@ -2688,7 +2694,7 @@ def train(
         dict: a summary dictionary of the training analysis
     """
     logger.setLevel(logging.getLevelName(log_level))
-
+    output_file_suffix = str(output_file_suffix)
     assert tp_size <= num_gpus_per_node, (
         f"tp_size must be <= {num_gpus_per_node}(num_gpus_per_node), tensor"
         " parallelism requires high communication bandwidth to be efficient"
@@ -2717,7 +2723,7 @@ def train(
             f'neither dp_size or total_num_gpus is specified, assuming dp_size = 1'
         )
     logger.info(
-        f'replicated data parallel process size {rdp_size=}, {dp_size=}, {total_num_gpus=}'
+        f'replicated data parallel process size rdp_size={rdp_size}, dp_size={dp_size}, total_num_gpus={total_num_gpus}'
     )
     model_config = get_model_config_by_name(model_name)
     gpu_config = get_gpu_config_by_name(gpu_name)

@@ -1,0 +1,11 @@
+{
+    "name": "decapoda-research_llama-2080b-hf",
+    "num_layers": 256,
+    "n_head": 200,
+    "hidden_dim": 32768,
+    "vocab_size": 32000,
+    "max_seq_len": 2048,
+    "ffn_embed_dim": 131072,
+    "model_type": "llama",
+    "param_count": 2080
+}
