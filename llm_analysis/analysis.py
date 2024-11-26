@@ -1491,7 +1491,7 @@ class LLMAnalysis:
         logger.info(config_str)
 
     def get_configs_desc(self) -> str:
-        return f"{self.model_config.name}-{self.gpu_config.name}-{self.dtype_config.name}-tp{self.parallelism_config.tp_size}-pp{self.parallelism_config.pp_size}-dp{self.parallelism_config.dp_size}-sp{self.parallelism_config.sp_size}-fe{round(self.flops_efficiency, 2)}-ep{self.parallelism_config.ep_size}-hbme{self.hbm_memory_efficiency}"
+        return f"{self.model_config.name}-{self.gpu_config.name}-{self.dtype_config.name}-tp{self.parallelism_config.tp_size}-pp{self.parallelism_config.pp_size}-dp{self.parallelism_config.dp_size}-sp{self.parallelism_config.sp_size}-fe{round(self.flops_efficiency, 2)}-ep{self.parallelism_config.ep_size}-hbme{self.hbm_memory_efficiency}-mb{self.batch_size_per_gpu}-ac{self.ac}"
 
     def get_readable_summary_dict(self,
                                   summary_dict: dict,
@@ -1521,7 +1521,7 @@ class LLMAnalysis:
         activation_recomputation: int = 0,
     ):
         file_name = output_file_prefix + self.get_configs_desc(
-        ) + f'-ac{activation_recomputation}'+output_file_suffix + "-summary.json"
+        ) + f"{output_file_suffix}-summary.json"
 
         if not os.path.exists(output_dir):
             try:
@@ -2477,7 +2477,11 @@ class LLMAnalysis:
             latency_per_micro_batch,
             "latency_fwd":
             latency_fwd,
+            "activation_recomputation_num":
+            ActivationRecomputation(activation_recomputation).value,
         }
+        self.batch_size_per_gpu = batch_size_per_gpu
+        self.ac = ActivationRecomputation(activation_recomputation).value
         summary_dict.update(latency_fwd_breakdown)
         device_tokens_per_sec = round(
             seq_len * batch_size_per_gpu / latency_per_iter, 2)
